@@ -44,7 +44,7 @@ public class UsersController {
 
     @GetMapping("ping")
     public String returnTestResult() {
-        return "Pong";
+        return "Pong From PlantsServer";
     }
 
     @PostMapping("/registration")
