@@ -3,11 +3,9 @@ package com.server.backend.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import static javax.persistence.CascadeType.*;
-import static javax.persistence.CascadeType.REFRESH;
 
 @Entity
 @Table(name = "users")
@@ -36,15 +34,21 @@ public class UserInfo {
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private Token token;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {DETACH, MERGE, PERSIST, REFRESH})
-    @JoinTable(
-            name = "user_plants",
-            joinColumns = @JoinColumn(name = "fk_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "fk_plant_id")
-    )
-    private Set<PlantModel> ownPlants;
+    @JsonIgnore
+    @OneToMany(mappedBy = "userOwner", fetch = FetchType.EAGER)
+    private Set<UserPlant> userPlants = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "userAssigned", fetch = FetchType.EAGER)
+    private Set<UserPlant> assignedUserPlants = new HashSet<>();
 
     public UserInfo() {
+        if (userPlants == null) {
+            setOwnPlants(new HashSet<>());
+        }
+        if (assignedUserPlants == null) {
+            setAssignedPlants(new HashSet<>());
+        }
     }
 
     public String getEmail() {
@@ -95,25 +99,30 @@ public class UserInfo {
         this.token = token;
     }
 
-    public Set<PlantModel> getOwnPlants() {
-        return ownPlants;
+    public Set<UserPlant> getOwnPlants() {
+        return userPlants;
     }
 
-    public void setOwnPlants(Set<PlantModel> ownPlants) {
-        this.ownPlants = ownPlants;
+    public void setOwnPlants(Set<UserPlant> ownPlants) {
+        this.userPlants = ownPlants;
     }
 
-    public void addPlantToOwnCollection(PlantModel plant) {
-        if (ownPlants == null) {
-            ownPlants = new HashSet<>(200);
-        }
-        ownPlants.add(plant);
+    public Set<UserPlant> getAssignedPlants() {
+        return assignedUserPlants;
     }
 
-    public void removePlantFromOwnCollection(PlantModel plant) {
-        if (ownPlants == null) {
+    public void setAssignedPlants(Set<UserPlant> assignedPlants) {
+        this.assignedUserPlants = assignedPlants;
+    }
+
+    public <E extends Collection<UserPlant>>void addPlantToCollection(UserPlant plant, E collection) {
+        collection.add(plant);
+    }
+
+    public <E extends Collection<UserPlant>> void removePlantFromCollection(UserPlant plant, E collection) {
+        if (collection == null) {
             throw new EntityNotFoundException("No Plants Exist for this user");
         }
-        ownPlants.remove(plant);
+        collection.remove(plant);
     }
 }

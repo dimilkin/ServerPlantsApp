@@ -2,22 +2,17 @@ package com.server.backend.controllers;
 
 
 import com.server.backend.dto.AccountRegDto;
-import com.server.backend.exceptions.DuplicateEntityException;
-import com.server.backend.exceptions.EntityNotFoundException;
 import com.server.backend.models.UserInfo;
+import com.server.backend.security.UserAssessmentService;
 import com.server.backend.security.UserRegistrationHandler;
 import com.server.backend.security.jwt.JwtResponse;
 import com.server.backend.security.jwt.JwtTokenUtil;
 import com.server.backend.services.UserInfoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
@@ -32,14 +27,16 @@ public class UsersController {
     private final UserRegistrationHandler registrationHandler;
     private AuthenticationManager authenticationManager;
     private JwtTokenUtil jwtTokenUtil;
+    private UserAssessmentService assessmentService;
 
-    @Autowired
     public UsersController(UserInfoService userInfoService, UserRegistrationHandler registrationHandler,
-                           AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
+                           AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil,
+                           UserAssessmentService assessmentService) {
         this.userInfoService = userInfoService;
         this.registrationHandler = registrationHandler;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.assessmentService = assessmentService;
     }
 
     @GetMapping("ping")
@@ -50,69 +47,40 @@ public class UsersController {
     @PostMapping("/registration")
     public String createNewUser(@RequestBody final AccountRegDto accountRegDto,
                                 HttpServletRequest request) {
-
-        try {
-            String token = UUID.randomUUID().toString();
-            registrationHandler.startUserRegistration(accountRegDto, token, request);
-            return "Success!";
-        } catch (DuplicateEntityException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        }
+        String token = UUID.randomUUID().toString();
+        registrationHandler.startUserRegistration(accountRegDto, token, request);
+        return "Success!";
     }
 
     @RequestMapping("/authentication")
     public ResponseEntity<?> createAuthenticationToken(@RequestHeader("userMail") String email,
                                                        @RequestHeader("userPass") String password) {
-
-        try {
-            authenticate(email, password);
-            final UserInfo userDetails = userInfoService.getByEmail(email);
-            final String token = jwtTokenUtil.generateToken(userDetails);
-            JwtResponse response = new JwtResponse(userDetails.getId());
-            return ResponseEntity.ok().header("authToken", token).body(response);
-        } catch (DisabledException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account has been disabled");
-        } catch (BadCredentialsException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong UserName or Password");
-        }
+        authenticate(email, password);
+        final UserInfo userDetails = userInfoService.getByEmail(email);
+        final String token = jwtTokenUtil.generateToken(userDetails);
+        JwtResponse response = new JwtResponse(userDetails.getId());
+        return ResponseEntity.ok().header("authToken", token).body(response);
     }
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<UserInfo> getUserInfo(@PathVariable("userId") int userId) {
-        try {
-            UserInfo userInfo = userInfoService.getById(userId);
-            return new ResponseEntity<UserInfo>(userInfo, HttpStatus.OK);
-
-        } catch (EntityNotFoundException exception) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
+        UserInfo userInfo = userInfoService.getById(userId);
+        return new ResponseEntity<UserInfo>(userInfo, HttpStatus.OK);
     }
 
     @PutMapping("/profile/{userId}")
     public ResponseEntity<AccountRegDto> updateUserProfile(HttpServletRequest request,
-                                                           @PathVariable("userId") int userId) {
-
-        try {
-            String email = JwtTokenUtil.getUserEmail(request, jwtTokenUtil);
-            UserInfo userInfo = userInfoService.getByEmail(email);
-
-            if (userInfo.getId() == userId) {
-                userInfoService.update(userInfo);
-                return new ResponseEntity<AccountRegDto>(HttpStatus.OK);
-            } else {
-                throw new IllegalAccessException(" User can't change other users data");
-            }
-
-        } catch (EntityNotFoundException exception) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        } catch (IllegalAccessException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't change this profile");
+                                                           @PathVariable("userId") int userId) throws IllegalAccessException {
+        UserInfo currentUser = userInfoService.getById(userId);
+        if (assessmentService.isUserValid(currentUser, request)) {
+            userInfoService.update(currentUser);
+            return new ResponseEntity<AccountRegDto>(HttpStatus.OK);
+        } else {
+            throw new IllegalAccessException(" User can't change other users data");
         }
     }
 
     private void authenticate(String username, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
-
-
 }

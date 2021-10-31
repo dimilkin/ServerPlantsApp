@@ -5,9 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.hibernate.NonUniqueResultException;
+import org.springframework.web.client.HttpClientErrorException;
 
 
 import javax.persistence.NoResultException;
@@ -21,20 +24,42 @@ public class ExceptionsHandler {
     public ResponseEntity<Object> handleInvalidInputException(NoResultException ex) {
         logger.error("No info for query found: ", ex.getMessage());
         return new ResponseEntity<Object>("No data found for your request", HttpStatus.NO_CONTENT);
-
     }
 
     @ExceptionHandler(value = {NonUniqueResultException.class})
     public ResponseEntity<Object> handleInvalidInputException(NonUniqueResultException ex) {
         logger.error("More than one results found for query: ", ex.getMessage());
         return new ResponseEntity<Object>("More than one item found for your request", HttpStatus.BAD_REQUEST);
+    }
 
+    @ExceptionHandler(value = {DuplicateEntityException.class})
+    public ResponseEntity<Object> handleDuplicatedEntityException(DuplicateEntityException ex) {
+        logger.error("More than one results found for query: ", ex.getMessage());
+        return new ResponseEntity<Object>("This item already exists", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {EntityNotFoundException.class})
     public ResponseEntity<Object> handleInvalidInputException(EntityNotFoundException ex) {
         logger.error("No Info found for query: ", ex.getMessage());
-        return ResponseEntity.status( HttpStatus.NOT_FOUND).body(ex.getMessage());
+        return ResponseEntity.status( HttpStatus.NOT_FOUND).body("Oops, we don't have that one");
+    }
+
+    @ExceptionHandler(value = {DisabledException.class})
+    public ResponseEntity<Object> handleDisabledUserException(DisabledException ex) {
+        logger.error("No Info found for query: ", ex.getMessage());
+        return ResponseEntity.status( HttpStatus.NOT_FOUND).body("No Such User Found");
+    }
+
+    @ExceptionHandler(value = {BadCredentialsException.class})
+    public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException ex) {
+        logger.error("No Info found for query: ", ex.getMessage());
+        return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body("Incorrect Email or Password");
+    }
+
+    @ExceptionHandler(value = {IllegalAccessException.class})
+    public ResponseEntity<Object> handleBadCredentialsException(IllegalAccessException ex) {
+        logger.error("No Info found for query: ", ex.getMessage());
+        return ResponseEntity.status( HttpStatus.BAD_REQUEST).body("No permission to access these resources");
     }
 
 }
