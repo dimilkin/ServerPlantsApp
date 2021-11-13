@@ -30,6 +30,7 @@ public class UserPlant {
     @JoinColumn(name = "user_owner")
     private UserInfo userOwner;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_assigned")
     private UserInfo userAssigned;
