@@ -19,10 +19,10 @@ import static com.server.backend.controllers.RouteConstants.FIRST_API_VERION_PAT
 @RequestMapping(FIRST_API_VERION_PATH + "userplants/")
 public class UserPlantsController {
 
-    private PlantsService plantsService;
-    private UserInfoService userInfoService;
-    private UserAssessmentService assessmentService;
-    private UserPlantService userPlantService;
+    private final PlantsService plantsService;
+    private final UserInfoService userInfoService;
+    private final UserAssessmentService assessmentService;
+    private final UserPlantService userPlantService;
 
     public UserPlantsController(PlantsService plantsService, UserInfoService userInfoService,
                                 UserAssessmentService assessmentService, UserPlantService userPlantService) {
@@ -34,38 +34,55 @@ public class UserPlantsController {
 
     @PostMapping("{hostUserId}/{plantId}")
     public ResponseEntity<String> addPlantToUser(HttpServletRequest request,
-                                                 @PathVariable("hostUserId") int userId,
+                                                 @PathVariable("hostUserId") int hostUserId,
                                                  @PathVariable("plantId") int plantId,
                                                  @RequestBody PlantToUserDto plantToUserDto) throws IllegalAccessException {
-        UserInfo hostUser = userInfoService.getById(userId);
-
-
-        if (assessmentService.isUserValid(hostUser, request)) {
+        if (assessmentService.isUserValid(hostUserId, request)) {
+            UserInfo hostUser = userInfoService.getById(hostUserId);
             UserPlant userPlant = new UserPlant();
             userPlant.setProvidedName(plantToUserDto.getProvidedName());
             userPlant.setWaterPeriod(plantToUserDto.getWaterPeriod());
             userPlant.setUserOwner(hostUser);
-            userPlant.setUserAssigned(hostUser);
             userPlant.setPlant(plantsService.getById(plantId));
-            userPlantService.createUserPlant(userPlant);
+            userPlantService.addPlantToUserOwnCollection(userPlant);
             return new ResponseEntity<String>("Success!", HttpStatus.OK);
         } else {
             throw new IllegalAccessException(" User can't change other users data");
         }
-
     }
 
-    //TODO -> transfer plant from one user to another
-    @PostMapping("{hostUserId}/{plantId/{recepientUserId}")
-    public ResponseEntity<String> transferPlantToAnotherUser(HttpServletRequest request,
+    @DeleteMapping("{hostUserId}/{plantId}")
+    public ResponseEntity<String> deletePlantFromUser(HttpServletRequest request,
+                                                 @PathVariable("hostUserId") int hostUserId,
+                                                 @PathVariable("plantId") int plantId) throws IllegalAccessException {
+        if (assessmentService.isUserValid(hostUserId, request)) {
+            userPlantService.removePlantFromUserOwnCollection(hostUserId, plantId);
+            return new ResponseEntity<String>("Success!", HttpStatus.OK);
+        } else {
+            throw new IllegalAccessException(" User can't change other users data");
+        }
+    }
+
+    @PostMapping("{hostUserId}/{plantId}/{recepientUserId}")
+    public ResponseEntity<String> assignPlantToAnotherUser(HttpServletRequest request,
                                                              @PathVariable("hostUserId") int hostUserId,
                                                              @PathVariable("plantId") int userPlantId,
-                                                             @PathVariable("hostUserId") int recepientUserId) throws IllegalAccessException {
-        UserInfo hostUser = userInfoService.getById(hostUserId);
+                                                             @PathVariable("recepientUserId") int recepientUserId) throws IllegalAccessException {
 
-        if (assessmentService.isUserValid(hostUser, request)) {
-            UserPlant userPlant = userPlantService.getById(userPlantId);
-            userPlantService.update(userPlant);
+        if (assessmentService.isUserValid(hostUserId, request)) {
+            userPlantService.addPlantToUserAssignedCollection(hostUserId, userPlantId, recepientUserId);
+            return new ResponseEntity<String>("Success!", HttpStatus.OK);
+        } else {
+            throw new IllegalAccessException(" User can't change other users data");
+        }
+    }
+
+    @PutMapping("remove/{plantId}/{recepientUserId}")
+    public ResponseEntity<String> unassignPlantFromUser(HttpServletRequest request,
+                                                        @PathVariable("plantId") int userPlantId,
+                                                        @PathVariable("recepientUserId") int recepientUserId) throws IllegalAccessException{
+        if (assessmentService.isUserValid(recepientUserId, request)) {
+            userPlantService.removePlantFromUserAssignedCollection(recepientUserId, userPlantId);
             return new ResponseEntity<String>("Success!", HttpStatus.OK);
         } else {
             throw new IllegalAccessException(" User can't change other users data");

@@ -71,8 +71,8 @@ public class UsersController {
     @PutMapping("/profile/{userId}")
     public ResponseEntity<AccountRegDto> updateUserProfile(HttpServletRequest request,
                                                            @PathVariable("userId") int userId) throws IllegalAccessException {
-        UserInfo currentUser = userInfoService.getById(userId);
-        if (assessmentService.isUserValid(currentUser, request)) {
+        if (assessmentService.isUserValid(userId, request)) {
+            UserInfo currentUser = userInfoService.getById(userId);
             userInfoService.update(currentUser);
             return new ResponseEntity<AccountRegDto>(HttpStatus.OK);
         } else {

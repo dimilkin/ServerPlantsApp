@@ -46,7 +46,7 @@ public class UserRegistrationHandler {
         userInfoService.create(user);
         tokenService.saveToken(token, user);
         final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + ":" + request.getContextPath();
-        sendVerificationEmail(user, token, appUrl);
+//        sendVerificationEmail(user, token, appUrl);
     }
 
     public void finishUserRegistration(String token){

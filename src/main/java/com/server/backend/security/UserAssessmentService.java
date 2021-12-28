@@ -18,9 +18,11 @@ public class UserAssessmentService {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    public boolean isUserValid(UserInfo currentUser, HttpServletRequest request) throws IllegalAccessException {
+    public boolean isUserValid(int currentUserId, HttpServletRequest request) {
         String email = JwtTokenUtil.getUserEmail(request, jwtTokenUtil);
         UserInfo requestUser = userInfoService.getByEmail(email);
+
+        UserInfo currentUser = userInfoService.getById(currentUserId);
         return requestUser.getId() == currentUser.getId();
     }
 }

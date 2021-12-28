@@ -9,7 +9,6 @@ import com.server.backend.services.UserPlantService;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Collection;
 
 @Service
 public class UserPlantServiceImpl implements UserPlantService {
@@ -25,12 +24,7 @@ public class UserPlantServiceImpl implements UserPlantService {
     }
 
     @Override
-    public void createUserPlant(UserPlant userPlant) {
-        userPlantRepo.save(userPlant);
-    }
-
-    @Override
-    public void update(UserPlant userPlant) {
+    public void addPlantToUserOwnCollection(UserPlant userPlant) {
         userPlantRepo.save(userPlant);
     }
 
@@ -40,39 +34,24 @@ public class UserPlantServiceImpl implements UserPlantService {
     }
 
     @Override
-    public void addPlantToUserOwnCollection(int userId, int plantId) {
-        UserInfo user = userInfoService.getById(userId);
-        addPlantToUserCollection(user, plantId, user.getOwnPlants());
-    }
-
-    @Override
-    public void addPlantToUserAssignedCollection(int userId, int plantId) {
-        UserInfo user = userInfoService.getById(userId);
-        addPlantToUserCollection(user, plantId, user.getAssignedPlants());
+    public void addPlantToUserAssignedCollection(int userOwnerid, int plantId, int  userAssignedId) {
+        UserPlant userPlant = findUserPlantByUserOwnerIdAndPlantId(userOwnerid, plantId);
+        UserInfo user = userInfoService.getById(userAssignedId);
+        userPlant.setUserAssigned(user);
+        userPlantRepo.save(userPlant);
     }
 
     @Override
     public void removePlantFromUserOwnCollection(int userId, int plantId) {
-        UserInfo user = userInfoService.getById(userId);
-        removePlantFromUserCollection(user, plantId, user.getOwnPlants());
+        UserPlant userPlant = findUserPlantByUserOwnerIdAndPlantId(userId, plantId);
+        userPlantRepo.delete(userPlant);
     }
 
     @Override
     public void removePlantFromUserAssignedCollection(int userId, int plantId) {
-        UserInfo user = userInfoService.getById(userId);
-        removePlantFromUserCollection(user, plantId, user.getAssignedPlants());
-    }
-
-    private <E extends Collection<UserPlant>> void addPlantToUserCollection(UserInfo user, int plantId, E collection) {
-        UserPlant plant = findPlantById(plantId);
-        user.addPlantToCollection(plant, collection);
-        userInfoService.update(user);
-    }
-
-    private <E extends Collection<UserPlant>> void removePlantFromUserCollection(UserInfo user, int plantId, E e) {
-        UserPlant plant = findPlantById(plantId);
-        user.removePlantFromCollection(plant, e);
-        userInfoService.update(user);
+       UserPlant userPlant = findUserPlantByAssignedUserIdAndPlantId(userId, plantId);
+       userPlant.setUserAssigned(null);
+       userPlantRepo.save(userPlant);
     }
 
     private UserPlant findPlantById(int id) {
@@ -81,5 +60,21 @@ public class UserPlantServiceImpl implements UserPlantService {
         } else {
             throw new EntityNotFoundException("No plant with that ID exists in DB");
         }
+    }
+
+    private UserPlant findUserPlantByUserOwnerIdAndPlantId(int userId, int plantId) {
+        UserPlant userPlant = userPlantRepo.findByUserIdAndPlantId(userId, plantId);
+        if (userPlant == null) {
+            throw new EntityNotFoundException("Plant for this user can't be found");
+        }
+        return userPlant;
+    }
+
+    private UserPlant findUserPlantByAssignedUserIdAndPlantId(int userId, int plantId) {
+        UserPlant userPlant = userPlantRepo.findByAssignerUserIdAndPlantId(userId, plantId);
+        if (userPlant == null) {
+            throw new EntityNotFoundException("Plant for this user can't be found");
+        }
+        return userPlant;
     }
 }

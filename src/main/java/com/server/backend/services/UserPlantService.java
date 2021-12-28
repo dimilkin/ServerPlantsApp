@@ -4,17 +4,13 @@ import com.server.backend.models.UserPlant;
 
 public interface UserPlantService {
 
-    void addPlantToUserOwnCollection(int userId, int plantId);
+    void addPlantToUserOwnCollection(UserPlant userPlant);
 
-    void addPlantToUserAssignedCollection(int userId, int plantId);
+    void addPlantToUserAssignedCollection(int userOwnerid, int plantIdi, int  userAssignedId);
 
     void removePlantFromUserOwnCollection(int userId, int plantId);
 
     void removePlantFromUserAssignedCollection(int userId, int plantId);
-
-    void createUserPlant(UserPlant userPlant);
-
-    void update(UserPlant userPlant);
 
     UserPlant getById(int userPlantId);
 }

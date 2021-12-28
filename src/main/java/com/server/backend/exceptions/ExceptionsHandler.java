@@ -7,24 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.hibernate.NonUniqueResultException;
-
-
 import javax.persistence.NoResultException;
+import javax.persistence.EntityNotFoundException;
 
 @ControllerAdvice
 public class ExceptionsHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(com.server.backend.exceptions.ExceptionsHandler.class);
-
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<Object> test(Exception ex) {
-        logger.error("From Test Exception ", ex.getMessage());
-        return new ResponseEntity<Object>("Test test", HttpStatus.BAD_GATEWAY);
-    }
 
     @ExceptionHandler(value = NoResultException.class)
     public ResponseEntity<Object> handleInvalidInputException(NoResultException ex) {
@@ -41,13 +34,13 @@ public class ExceptionsHandler {
     @ExceptionHandler(value = DuplicateEntityException.class)
     public ResponseEntity<Object> handleDuplicatedEntityException(DuplicateEntityException ex) {
         logger.error("More than one results found for query: ", ex.getMessage());
-        return new ResponseEntity<Object>("This item already exists", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Object>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<Object> handleInvalidInputException(EntityNotFoundException ex) {
         logger.error("No Info found for query: ", ex.getMessage());
-        return ResponseEntity.status( HttpStatus.NOT_FOUND).body("Oops, we don't have that one");
+        return ResponseEntity.status( HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(value = DisabledException.class)
@@ -62,10 +55,23 @@ public class ExceptionsHandler {
         return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body("Incorrect Email or Password");
     }
 
+    @ExceptionHandler(value = InternalAuthenticationServiceException.class)
+    public ResponseEntity<Object> handleAuthenticationException(InternalAuthenticationServiceException ex) {
+        logger.error("Authentication Exception : " + ex.getStackTrace());
+        ex.printStackTrace();
+        return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body("Authentication Failed");
+    }
+
     @ExceptionHandler(value = IllegalAccessException.class)
     public ResponseEntity<Object> handleBadCredentialsException(IllegalAccessException ex) {
         logger.error("No Info found for query: ", ex.getMessage());
         return ResponseEntity.status( HttpStatus.BAD_REQUEST).body("No permission to access these resources");
     }
 
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<Object> test(Exception ex) {
+        logger.error("General Exception :");
+        ex.printStackTrace();
+        return new ResponseEntity<Object>("Something Went Wrong! Support is looking into it.", HttpStatus.SERVICE_UNAVAILABLE);
+    }
 }

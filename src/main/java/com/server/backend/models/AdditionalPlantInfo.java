@@ -15,7 +15,7 @@ public class AdditionalPlantInfo {
     private long id;
 
     @Column(name = "info_header")
-    private String header;
+    private String title;
 
     @Column(name = "info_content")
     private String content;
@@ -36,12 +36,12 @@ public class AdditionalPlantInfo {
         this.id = id;
     }
 
-    public String getHeader() {
-        return header;
+    public String getTitle() {
+        return title;
     }
 
-    public void setHeader(String header) {
-        this.header = header;
+    public void setTitle(String header) {
+        this.title = header;
     }
 
     public String getContent() {

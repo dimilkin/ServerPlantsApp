@@ -1,12 +1,10 @@
 package com.server.backend.services.impl;
 
-
+import javax.persistence.EntityNotFoundException;
 import com.server.backend.models.PlantModel;
 import com.server.backend.repos.PlantsRepo;
 import com.server.backend.services.PlantsService;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
