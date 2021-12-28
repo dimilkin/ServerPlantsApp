@@ -45,6 +45,12 @@ public class PlantsController {
         return new ResponseEntity<PlantModel>(plant, HttpStatus.OK);
     }
 
+    @GetMapping("allPlants")
+    public ResponseEntity<List<PlantModel>> getInfoForAllPlants() {
+        List<PlantModel> plantsList = plantsService.getAll();
+        return new ResponseEntity<List<PlantModel>>(plantsList, HttpStatus.OK);
+    }
+
     @PutMapping("additionalInfo/{plantId}")
     public ResponseEntity<String> addInfoForPlant(@PathVariable("plantId") int plantId,
                                                   @RequestBody AdditionalPlantInfo additionalPlantInfo) {
