@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.UUID;
 
 import static com.server.backend.controllers.RouteConstants.FIRST_API_VERION_PATH;
@@ -59,13 +60,19 @@ public class UsersController {
         final UserInfo userDetails = userInfoService.getByEmail(email);
         final String token = jwtTokenUtil.generateToken(userDetails);
         JwtResponse response = new JwtResponse(userDetails.getId());
-        return ResponseEntity.ok().header("authToken", token).body(response);
+        return ResponseEntity.ok().header("authToken", token).body(userDetails.getId());
     }
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<UserInfo> getUserInfo(@PathVariable("userId") int userId) {
         UserInfo userInfo = userInfoService.getById(userId);
         return new ResponseEntity<UserInfo>(userInfo, HttpStatus.OK);
+    }
+
+    @GetMapping("/allProfile")
+    public ResponseEntity<List<UserInfo>> getAllUserInfo() {
+        List<UserInfo> userInfoList = userInfoService.getAll();
+        return new ResponseEntity<List<UserInfo>>(userInfoList, HttpStatus.OK);
     }
 
     @PutMapping("/profile/{userId}")
