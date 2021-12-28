@@ -1,5 +1,6 @@
 package com.server.backend.services;
 
+import com.server.backend.dto.PlantInfoDto;
 import com.server.backend.models.PlantModel;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface PlantsService {
 
     void create(PlantModel plant);
 
-    void update(PlantModel plant);
+    void update(PlantInfoDto plant, int plantId);
 
     void delete(int id);
 

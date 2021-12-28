@@ -20,7 +20,6 @@ public class UserPlant {
     @Column(name = "provided_name")
     private String providedName;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "plant_id")
     private PlantModel plant;

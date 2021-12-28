@@ -1,5 +1,6 @@
 package com.server.backend.controllers;
 
+import com.server.backend.dto.PlantInfoDto;
 import com.server.backend.models.AdditionalPlantInfo;
 import com.server.backend.models.PlantModel;
 import com.server.backend.models.PotentialPlantProblems;
@@ -37,7 +38,12 @@ public class PlantsController {
         return new ResponseEntity<String>("Success!", HttpStatus.OK);
     }
 
-    // TODO -> create update plant logic here
+    @PutMapping("updatePlant/{plantId}")
+    public ResponseEntity<PlantModel> updatePlant(@PathVariable("plantId") int plantId,
+                                                  @RequestBody PlantInfoDto plantInfoDto) {
+        plantsService.update(plantInfoDto, plantId);
+        return new ResponseEntity<PlantModel>(HttpStatus.OK);
+    }
 
     @GetMapping("{plantId}")
     public ResponseEntity<PlantModel> getInfoForPlantById(@PathVariable("plantId") int plantId) {

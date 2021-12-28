@@ -1,10 +1,10 @@
 package com.server.backend.dto;
 
-public class PlantToUserDto {
+public class UserPlantDto {
     private int waterPeriod;
     private String providedName;
 
-    public PlantToUserDto() {
+    public UserPlantDto() {
     }
 
     public int getWaterPeriod() {

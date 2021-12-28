@@ -1,6 +1,6 @@
 package com.server.backend.controllers;
 
-import com.server.backend.dto.PlantToUserDto;
+import com.server.backend.dto.UserPlantDto;
 import com.server.backend.models.UserInfo;
 import com.server.backend.models.UserPlant;
 import com.server.backend.security.UserAssessmentService;
@@ -36,7 +36,7 @@ public class UserPlantsController {
     public ResponseEntity<String> addPlantToUser(HttpServletRequest request,
                                                  @PathVariable("hostUserId") int hostUserId,
                                                  @PathVariable("plantId") int plantId,
-                                                 @RequestBody PlantToUserDto plantToUserDto) throws IllegalAccessException {
+                                                 @RequestBody UserPlantDto plantToUserDto) throws IllegalAccessException {
         if (assessmentService.isUserValid(hostUserId, request)) {
             UserInfo hostUser = userInfoService.getById(hostUserId);
             UserPlant userPlant = new UserPlant();
