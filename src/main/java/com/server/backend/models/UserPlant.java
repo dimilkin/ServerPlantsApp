@@ -2,6 +2,7 @@ package com.server.backend.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
@@ -20,6 +21,9 @@ public class UserPlant {
     @Column(name = "provided_name")
     private String providedName;
 
+    @JsonIgnoreProperties({"origin", "commonName","scientificName","maxGrowth","poisonousForPets",
+            "temperature","light","watering","soil","rePotting","airHumidity","propagation","whereItGrowsBest",
+            "potentialProblems","additionalInformation"})
     @ManyToOne
     @JoinColumn(name = "plant_id")
     private PlantModel plant;
