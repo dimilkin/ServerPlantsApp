@@ -1,12 +1,15 @@
 package com.server.backend.services;
 
 import com.server.backend.dto.PlantInfoDto;
+import com.server.backend.dto.PlantsSearchDtoInfo;
 import com.server.backend.models.PlantModel;
 import java.util.List;
 
 public interface PlantsService {
 
     List<PlantModel> getAll();
+
+    List<PlantsSearchDtoInfo> getSearchInfo();
 
     void insertAllToDb(List<PlantModel> plants);
 

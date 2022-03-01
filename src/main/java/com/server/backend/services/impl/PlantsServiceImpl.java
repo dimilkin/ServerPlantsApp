@@ -3,17 +3,24 @@ package com.server.backend.services.impl;
 import javax.persistence.EntityNotFoundException;
 
 import com.server.backend.dto.PlantInfoDto;
+import com.server.backend.dto.PlantsSearchDtoInfo;
 import com.server.backend.mappers.PlantInfoMapper;
 import com.server.backend.models.PlantModel;
 import com.server.backend.repos.PlantsRepo;
 import com.server.backend.services.PlantsService;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PlantsServiceImpl implements PlantsService {
 
     private PlantsRepo plantsRepo;
+    private List<PlantsSearchDtoInfo> plantsSearchDtoInfos;
+    public List<PlantModel> allPlantsInfoFromDb;
 
     public PlantsServiceImpl(PlantsRepo plantsRepo) {
         this.plantsRepo = plantsRepo;
@@ -21,7 +28,26 @@ public class PlantsServiceImpl implements PlantsService {
 
     @Override
     public List<PlantModel> getAll() {
-        return plantsRepo.findAll();
+        if (allPlantsInfoFromDb == null){
+            allPlantsInfoFromDb = new ArrayList<>();
+            allPlantsInfoFromDb.addAll(plantsRepo.findAll());
+        }
+        return allPlantsInfoFromDb;
+    }
+
+    @Override
+    public List<PlantsSearchDtoInfo> getSearchInfo(){
+        if (plantsSearchDtoInfos == null || plantsSearchDtoInfos.isEmpty()){
+            plantsSearchDtoInfos = new ArrayList<>();
+            plantsSearchDtoInfos.addAll(getSearchInfoFromDb());
+        }
+        return plantsSearchDtoInfos;
+    }
+
+    private List<PlantsSearchDtoInfo> getSearchInfoFromDb() {
+        return getAll().stream()
+                .map(plantModel -> new PlantsSearchDtoInfo(plantModel.getId(), plantModel.getCommonName(), plantModel.getScientificName()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -53,6 +79,12 @@ public class PlantsServiceImpl implements PlantsService {
     }
 
     private PlantModel findPlantById(int id) {
+        return getAll().stream()
+                .filter(model -> model.getId() == id)
+                .findFirst().orElse(getPlantInfoFromDb(id));
+    }
+
+    private PlantModel getPlantInfoFromDb(int id){
         if (plantsRepo.findById(id).isPresent()) {
             return plantsRepo.findById(id).get();
         } else {

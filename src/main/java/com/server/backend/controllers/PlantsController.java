@@ -1,6 +1,7 @@
 package com.server.backend.controllers;
 
 import com.server.backend.dto.PlantInfoDto;
+import com.server.backend.dto.PlantsSearchDtoInfo;
 import com.server.backend.models.AdditionalPlantInfo;
 import com.server.backend.models.PlantModel;
 import com.server.backend.models.PotentialPlantProblems;
@@ -35,7 +36,7 @@ public class PlantsController {
     @PostMapping("collection")
     public ResponseEntity<String> createPlantsList(@RequestBody List<PlantModel> plantModels) {
         plantsService.insertAllToDb(plantModels);
-        return new ResponseEntity<String>("Success!", HttpStatus.OK);
+        return new ResponseEntity<String>( HttpStatus.OK);
     }
 
     @PutMapping("updatePlant/{plantId}")
@@ -55,6 +56,12 @@ public class PlantsController {
     public ResponseEntity<List<PlantModel>> getInfoForAllPlants() {
         List<PlantModel> plantsList = plantsService.getAll();
         return new ResponseEntity<List<PlantModel>>(plantsList, HttpStatus.OK);
+    }
+
+    @GetMapping("allPlantsInfo")
+    public ResponseEntity<List<PlantsSearchDtoInfo>> getSearchInfoForAllPlants() {
+        List<PlantsSearchDtoInfo> plantsList = plantsService.getSearchInfo();
+        return new ResponseEntity<List<PlantsSearchDtoInfo>>(plantsList, HttpStatus.OK);
     }
 
     @PutMapping("additionalInfo/{plantId}")
