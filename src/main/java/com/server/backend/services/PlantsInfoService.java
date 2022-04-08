@@ -12,5 +12,4 @@ public interface PlantsInfoService {
     String addPotentialProblemsInfoToPlant(int plantId, PotentialPlantProblems potentialPlantProblems);
 
     String updatePotentialProblemsInfoToPlant(int plantId, PotentialPlantProblems potentialPlantProblems);
-
 }

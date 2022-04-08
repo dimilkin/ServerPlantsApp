@@ -1,9 +1,9 @@
 package com.server.backend.models;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "plants")
@@ -40,10 +40,11 @@ public class PlantModel {
     @Column(name = "grow_best")
     private String whereItGrowsBest;
 
-    @OneToMany(mappedBy = "plantId")
-    private List<PotentialPlantProblems> potentialProblems;
-    @OneToMany(mappedBy = "plantId")
-    private List<AdditionalPlantInfo> additionalInformation;
+    @OneToMany(mappedBy = "plantId",  fetch = FetchType.EAGER)
+    private Set<PotentialPlantProblems> potentialProblems;
+
+    @OneToMany(mappedBy = "plantId", fetch = FetchType.EAGER)
+    private Set<AdditionalPlantInfo> additionalInformation;
 
     public PlantModel() {
     }
@@ -119,11 +120,11 @@ public class PlantModel {
         return whereItGrowsBest;
     }
 
-    public List<PotentialPlantProblems> getPotentialProblems() {
+    public Set<PotentialPlantProblems> getPotentialProblems() {
         return potentialProblems;
     }
 
-    public List<AdditionalPlantInfo> getAdditionalInformation() {
+    public Set<AdditionalPlantInfo> getAdditionalInformation() {
         return additionalInformation;
     }
 
@@ -183,24 +184,24 @@ public class PlantModel {
         this.whereItGrowsBest = whereItGrowsBest;
     }
 
-    public void setPotentialProblems(List<PotentialPlantProblems> potentialProblems) {
+    public void setPotentialProblems(Set<PotentialPlantProblems> potentialProblems) {
         this.potentialProblems = potentialProblems;
     }
 
-    public void setAdditionalInformation(List<AdditionalPlantInfo> additionalInformation) {
+    public void setAdditionalInformation(Set<AdditionalPlantInfo> additionalInformation) {
         this.additionalInformation = additionalInformation;
     }
 
     public void addAdditionalInfo(AdditionalPlantInfo info){
         if (additionalInformation == null){
-            additionalInformation = new ArrayList<>();
+            additionalInformation = new HashSet<>();
         }
         additionalInformation.add(info);
     }
 
     public void addPotentialProblem(PotentialPlantProblems info){
         if (potentialProblems == null){
-            potentialProblems = new ArrayList<>();
+            potentialProblems = new HashSet<>();
         }
         potentialProblems.add(info);
     }

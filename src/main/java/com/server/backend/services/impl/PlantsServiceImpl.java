@@ -1,6 +1,9 @@
 package com.server.backend.services.impl;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Persistence;
 
 import com.server.backend.dto.PlantInfoDto;
 import com.server.backend.dto.PlantsSearchDtoInfo;
@@ -30,8 +33,9 @@ public class PlantsServiceImpl implements PlantsService {
     public List<PlantModel> getAll() {
         if (allPlantsInfoFromDb == null){
             allPlantsInfoFromDb = new ArrayList<>();
-            allPlantsInfoFromDb.addAll(plantsRepo.findAll());
         }
+        allPlantsInfoFromDb.clear();
+        allPlantsInfoFromDb.addAll(plantsRepo.findAll());
         return allPlantsInfoFromDb;
     }
 
