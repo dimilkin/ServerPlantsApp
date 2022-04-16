@@ -4,7 +4,7 @@ import com.server.backend.models.UserPlant;
 
 public interface UserPlantService {
 
-    void addPlantToUserOwnCollection(UserPlant userPlant);
+    UserPlant addPlantToUserOwnCollection(UserPlant userPlant);
 
     void addPlantToUserAssignedCollection(int userOwnerid, int plantIdi, int  userAssignedId);
 

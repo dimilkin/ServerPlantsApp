@@ -33,7 +33,7 @@ public class UserPlantsController {
     }
 
     @PostMapping("{hostUserId}/{plantId}")
-    public ResponseEntity<String> addPlantToUser(HttpServletRequest request,
+    public ResponseEntity<Integer> addPlantToUser(HttpServletRequest request,
                                                  @PathVariable("hostUserId") int hostUserId,
                                                  @PathVariable("plantId") int plantId,
                                                  @RequestBody UserPlantDto plantToUserDto) throws IllegalAccessException {
@@ -44,8 +44,8 @@ public class UserPlantsController {
             userPlant.setWaterPeriod(plantToUserDto.getWaterPeriod());
             userPlant.setUserOwner(hostUser);
             userPlant.setPlant(plantsService.getById(plantId));
-            userPlantService.addPlantToUserOwnCollection(userPlant);
-            return new ResponseEntity<String>("Success!", HttpStatus.OK);
+            UserPlant savedUserPlant = userPlantService.addPlantToUserOwnCollection(userPlant);
+            return new ResponseEntity<Integer>(savedUserPlant.getId(), HttpStatus.OK);
         } else {
             throw new IllegalAccessException(" User can't change other users data");
         }

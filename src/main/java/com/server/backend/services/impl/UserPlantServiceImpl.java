@@ -24,8 +24,8 @@ public class UserPlantServiceImpl implements UserPlantService {
     }
 
     @Override
-    public void addPlantToUserOwnCollection(UserPlant userPlant) {
-        userPlantRepo.save(userPlant);
+    public UserPlant addPlantToUserOwnCollection(UserPlant userPlant) {
+      return  userPlantRepo.save(userPlant);
     }
 
     @Override
