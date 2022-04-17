@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.hibernate.NonUniqueResultException;
@@ -57,7 +58,7 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(value = InternalAuthenticationServiceException.class)
     public ResponseEntity<Object> handleAuthenticationException(InternalAuthenticationServiceException ex) {
-        logger.error("Authentication Exception : " + ex.getStackTrace());
+        logger.error("Authentication Exception : ", ex.getMessage());
         ex.printStackTrace();
         return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body("Authentication Failed");
     }
@@ -73,5 +74,13 @@ public class ExceptionsHandler {
         logger.error("General Exception :");
         ex.printStackTrace();
         return new ResponseEntity<Object>("Something Went Wrong! Support is looking into it.", HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(value = MissingRequestHeaderException.class)
+    protected ResponseEntity<Object> handleRequestHeaderException(MissingRequestHeaderException ex) {
+        logger.error("Authentication Exception : ");
+        ex.printStackTrace();
+        return ResponseEntity.status( HttpStatus.BAD_REQUEST).body("Authentication Failed");
+
     }
 }
