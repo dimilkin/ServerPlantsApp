@@ -22,6 +22,10 @@ public class UserInfo {
     private String password;
 
     @JsonIgnore
+    @Column(name = "verif_code")
+    private String verificationCode;
+
+    @JsonIgnore
     @Column(name = "enabled")
     private boolean enabled;
 
@@ -81,6 +85,14 @@ public class UserInfo {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
     }
 
     public boolean isEnabled() {

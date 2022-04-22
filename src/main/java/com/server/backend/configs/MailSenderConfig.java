@@ -27,3 +27,7 @@ public class MailSenderConfig {
         return javaMailSender;
     }
 }
+
+
+//  javaMailSender.setUsername("testplant@mail.com");
+//  javaMailSender.setPassword("MyPa$$Word2022");

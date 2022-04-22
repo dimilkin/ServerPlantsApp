@@ -5,19 +5,19 @@ import org.springframework.context.ApplicationEvent;
 
 public class OnCreateAccountEvent extends ApplicationEvent {
 
-    private String appUrl;
-    private UserInfo user;
-    private String token;
+    private final String registrationCode;
+    private final UserInfo user;
+    private final String token;
 
-    public OnCreateAccountEvent( String appUrl, UserInfo user,  String token) {
+    public OnCreateAccountEvent( String registrationCode, UserInfo user,  String token) {
         super(user);
-        this.appUrl = appUrl;
+        this.registrationCode = registrationCode;
         this.user = user;
         this.token = token;
     }
 
-    public String getAppUrl() {
-        return appUrl;
+    public String getRegistrationCode() {
+        return registrationCode;
     }
     public UserInfo getUser() {
         return user;

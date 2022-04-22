@@ -22,14 +22,14 @@ public class CreateAccountListener implements ApplicationListener<OnCreateAccoun
         UserInfo user = event.getUser();
 
         String recipient = user.getEmail();
-        String subject = "Registration Confirmation";
-        String url= event.getAppUrl() + "/registrationconfirm?token=" + event.getToken();
+        String subject = "Registration Code";
+        String registrationCode = "This is your registration code for Plant Helper : " + event.getRegistrationCode();
         String message = "You successfully registered your account in PlantApp";
 
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipient);
         email.setSubject(subject);
-        email.setText(message);
+        email.setText(registrationCode);
         mailSender.send(email);
 
     }

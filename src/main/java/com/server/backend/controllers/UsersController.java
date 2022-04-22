@@ -1,6 +1,7 @@
 package com.server.backend.controllers;
 
 
+import com.server.backend.dto.AccountActivationDto;
 import com.server.backend.dto.AccountRegDto;
 import com.server.backend.models.UserInfo;
 import com.server.backend.security.UserAssessmentService;
@@ -46,10 +47,9 @@ public class UsersController {
     }
 
     @PostMapping("/registration")
-    public String createNewUser(@RequestBody final AccountRegDto accountRegDto,
-                                HttpServletRequest request) {
+    public String createNewUser(@RequestBody final AccountRegDto accountRegDto) {
         String token = UUID.randomUUID().toString();
-        registrationHandler.startUserRegistration(accountRegDto, token, request);
+        registrationHandler.startUserRegistration(accountRegDto, token);
         return "Success!";
     }
 
@@ -61,6 +61,15 @@ public class UsersController {
         final String token = jwtTokenUtil.generateToken(userDetails);
         JwtResponse response = new JwtResponse(userDetails.getId());
         return ResponseEntity.ok().header("authToken", token).body(userDetails.getId());
+    }
+
+    @PostMapping("/activation")
+    public ResponseEntity<?> activateUserProfile(@RequestBody AccountActivationDto accountActivationDto) {
+        if (registrationHandler.accountActivated(accountActivationDto.getUserEmail(), accountActivationDto.getActivationCode()))
+        {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @GetMapping("/profile/{userId}")
