@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.server.backend.security.Constants.AUTHORITY_USER;
@@ -23,6 +25,7 @@ public class UserRegistrationHandler {
     ApplicationEventPublisher eventPublisher;
     UserRolesService rolesService;
     PasswordEncoder encoder;
+    Map<String, UserInfo> usersWaitingActivation = new HashMap<>();
 
     public UserRegistrationHandler(UserInfoService userInfoService, VerificationTokenService tokenService, UserRolesService rolesService,
                                    ApplicationEventPublisher eventPublisher, PasswordEncoder encoder) {
@@ -44,18 +47,16 @@ public class UserRegistrationHandler {
         user.setPassword(encoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
         user.setVerificationCode(registrationCode);
-
+        usersWaitingActivation.put(registrationCode, user);
         sendVerificationCode(user, token, registrationCode);
-        userInfoService.create(user);
-        tokenService.saveToken(token, user);
     }
 
     public boolean accountActivated(String email, String code){
 
-        UserInfo user = userInfoService.getByEmail(email);
-        if (user.getVerificationCode().equals(code)) {
+        UserInfo user = usersWaitingActivation.get(code);
+        if (user != null && user.getEmail().equals(email)) {
             user.setEnabled(true);
-            userInfoService.update(user);
+            userInfoService.create(user);
             return true;
         }
         return false;

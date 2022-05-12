@@ -4,8 +4,6 @@ import com.server.backend.exceptions.DuplicateEntityException;
 import com.server.backend.models.UserInfo;
 import com.server.backend.repos.UserInfoRepo;
 import com.server.backend.services.UserInfoService;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -40,7 +38,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public void delete(int id) {
-
+        repository.deleteById(id);
     }
 
     @Override
@@ -61,11 +59,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     private boolean emailAlreadyExists(String userEmail) {
-        UserInfo user = new UserInfo();
-        user.setEmail(userEmail);
+        try {
+            return repository.getByEmail(userEmail) != null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
 
-        ExampleMatcher MAIL_MATCHER = ExampleMatcher.matchingAny().withMatcher(userEmail, ExampleMatcher.GenericPropertyMatchers.ignoreCase());
-        Example<UserInfo> example = Example.<UserInfo>of(user, MAIL_MATCHER);
-        return repository.exists(example);
     }
 }

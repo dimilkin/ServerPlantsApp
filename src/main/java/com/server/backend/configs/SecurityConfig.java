@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         restHttp.antMatcher("/v.1.0/api/**");
         restHttp.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
-                .antMatchers("/v.1.0/api/user/ping").permitAll()
+                .antMatchers("/v.1.0/api/user/ping", "/v.1.0/api/user/activation").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/v.1.0/api/user/authentication").permitAll()
                 .anyRequest().authenticated()

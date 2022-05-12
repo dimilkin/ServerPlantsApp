@@ -3,12 +3,14 @@ package com.server.backend.controllers;
 
 import com.server.backend.dto.AccountActivationDto;
 import com.server.backend.dto.AccountRegDto;
+import com.server.backend.dto.AuthResponse;
+import com.server.backend.models.Token;
 import com.server.backend.models.UserInfo;
 import com.server.backend.security.UserAssessmentService;
 import com.server.backend.security.UserRegistrationHandler;
-import com.server.backend.security.jwt.JwtResponse;
 import com.server.backend.security.jwt.JwtTokenUtil;
 import com.server.backend.services.UserInfoService;
+import com.server.backend.services.VerificationTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,15 +32,20 @@ public class UsersController {
     private AuthenticationManager authenticationManager;
     private JwtTokenUtil jwtTokenUtil;
     private UserAssessmentService assessmentService;
+    private VerificationTokenService tokenService;
 
-    public UsersController(UserInfoService userInfoService, UserRegistrationHandler registrationHandler,
-                           AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil,
-                           UserAssessmentService assessmentService) {
+    public UsersController(UserInfoService userInfoService,
+                           UserRegistrationHandler registrationHandler,
+                           AuthenticationManager authenticationManager,
+                           JwtTokenUtil jwtTokenUtil,
+                           UserAssessmentService assessmentService,
+                           VerificationTokenService tokenService) {
         this.userInfoService = userInfoService;
         this.registrationHandler = registrationHandler;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.assessmentService = assessmentService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping("ping")
@@ -47,10 +54,10 @@ public class UsersController {
     }
 
     @PostMapping("/registration")
-    public String createNewUser(@RequestBody final AccountRegDto accountRegDto) {
+    public ResponseEntity<?> createNewUser(@RequestBody final AccountRegDto accountRegDto) {
         String token = UUID.randomUUID().toString();
         registrationHandler.startUserRegistration(accountRegDto, token);
-        return "Success!";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping("/authentication")
@@ -59,17 +66,20 @@ public class UsersController {
         authenticate(email, password);
         final UserInfo userDetails = userInfoService.getByEmail(email);
         final String token = jwtTokenUtil.generateToken(userDetails);
-        JwtResponse response = new JwtResponse(userDetails.getId());
         return ResponseEntity.ok().header("authToken", token).body(userDetails.getId());
     }
 
     @PostMapping("/activation")
-    public ResponseEntity<?> activateUserProfile(@RequestBody AccountActivationDto accountActivationDto) {
+    public ResponseEntity<AuthResponse> activateUserProfile(@RequestBody AccountActivationDto accountActivationDto) {
         if (registrationHandler.accountActivated(accountActivationDto.getUserEmail(), accountActivationDto.getActivationCode()))
         {
-            return new ResponseEntity<>(HttpStatus.OK);
+            UserInfo user = userInfoService.getByEmail(accountActivationDto.getUserEmail());
+            AuthResponse response = new AuthResponse(user.getId(), user.getEmail());
+            return new ResponseEntity<AuthResponse>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+
+        AuthResponse response = new AuthResponse(-1, "");
+        return new ResponseEntity<AuthResponse>(response, HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/profile/{userId}")
@@ -94,6 +104,15 @@ public class UsersController {
         } else {
             throw new IllegalAccessException(" User can't change other users data");
         }
+    }
+
+    @DeleteMapping("/profile/delete/{userId}")
+    public ResponseEntity<?> deleteUserProfile(@PathVariable("userId") int userId){
+        UserInfo user = userInfoService.getById(userId);
+        Token token = user.getToken();
+        tokenService.delete(token);
+        userInfoService.delete(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void authenticate(String username, String password) {
