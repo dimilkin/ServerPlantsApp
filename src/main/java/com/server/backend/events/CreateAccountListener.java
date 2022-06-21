@@ -23,13 +23,14 @@ public class CreateAccountListener implements ApplicationListener<OnCreateAccoun
 
         String recipient = user.getEmail();
         String subject = "Registration Code";
-        String registrationCode = "This is your registration code for Plant Helper : " + event.getRegistrationCode();
-        String message = "You successfully registered your account in PlantApp";
+        String registrationCode = "This is your registration code for your DRYP app : " + event.getRegistrationCode();
+        String message = "You successfully registered your account!";
 
         SimpleMailMessage email = new SimpleMailMessage();
+        email.setFrom("myplantapp@outlook.com");
         email.setTo(recipient);
         email.setSubject(subject);
-        email.setText(registrationCode);
+        email.setText(message + "\n" + registrationCode);
         mailSender.send(email);
 
     }

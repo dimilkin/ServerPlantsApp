@@ -12,6 +12,8 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.hibernate.NonUniqueResultException;
+
+import javax.mail.SendFailedException;
 import javax.persistence.NoResultException;
 import javax.persistence.EntityNotFoundException;
 
@@ -78,9 +80,13 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(value = MissingRequestHeaderException.class)
     protected ResponseEntity<Object> handleRequestHeaderException(MissingRequestHeaderException ex) {
-        logger.error("Authentication Exception : ");
-        ex.printStackTrace();
+        logger.error("Authentication Exception : " + ex.getMessage());
         return ResponseEntity.status( HttpStatus.BAD_REQUEST).body("Authentication Failed");
+    }
 
+    @ExceptionHandler(value = SendFailedException.class)
+    protected ResponseEntity<Object> handleWrongMailException(SendFailedException exception) {
+        logger.error("Invalid Email : " + exception.getMessage());
+        return ResponseEntity.status( HttpStatus.BAD_REQUEST).body("Authentication Failed");
     }
 }
