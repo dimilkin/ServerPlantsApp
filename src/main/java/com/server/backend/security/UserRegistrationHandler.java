@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.mail.SendFailedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,13 +37,13 @@ public class UserRegistrationHandler {
         this.encoder = encoder;
     }
 
-    public void startUserRegistration(AccountRegDto accountDto, String token) {
+    public void startUserRegistration(AccountRegDto accountDto, String token) throws SendFailedException {
 
         UserInfo user = new UserInfo();
         user.setEnabled(false);
         UserRole role = rolesService.getByValue(AUTHORITY_USER);
-        final String registrationCode = generateRegistrationCode();
 
+        final String registrationCode = generateRegistrationCode();
         user.setUserRole(role);
         user.setPassword(encoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());

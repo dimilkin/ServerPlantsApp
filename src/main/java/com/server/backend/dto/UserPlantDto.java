@@ -1,7 +1,7 @@
 package com.server.backend.dto;
 
 public class UserPlantDto {
-    private int userPlantId;
+    private int id;
     private int waterPeriod;
     private String providedName;
     private int plantModelId;
@@ -9,12 +9,12 @@ public class UserPlantDto {
     public UserPlantDto() {
     }
 
-    public int getUserPlantId() {
-        return userPlantId;
+    public int getId() {
+        return id;
     }
 
-    public void setUserPlantId(int userPlantId) {
-        this.userPlantId = userPlantId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getWaterPeriod() {

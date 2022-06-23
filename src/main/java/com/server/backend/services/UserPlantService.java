@@ -6,9 +6,11 @@ public interface UserPlantService {
 
     UserPlant addPlantToUserOwnCollection(UserPlant userPlant);
 
-    void addPlantToUserAssignedCollection(int userOwnerid, int plantIdi, int  userAssignedId);
+    UserPlant updateUserPlant(UserPlant userPlant);
 
-    void removePlantFromUserOwnCollection(int userId, int plantId);
+    void addPlantToUserAssignedCollection(int userPlantId, int  userAssignedId);
+
+    void removePlantFromUserOwnCollection(int userPlantId);
 
     void removePlantFromUserAssignedCollection(int userId, int plantId);
 

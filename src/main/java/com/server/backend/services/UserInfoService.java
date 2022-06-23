@@ -17,4 +17,6 @@ public interface UserInfoService {
     UserInfo getById(int id);
 
     UserInfo getByEmail(String userEmail);
+
+    boolean emailAlreadyExists(String userEmail);
 }

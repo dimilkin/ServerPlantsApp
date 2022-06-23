@@ -58,7 +58,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         throw new EntityNotFoundException("No user found with that email");
     }
 
-    private boolean emailAlreadyExists(String userEmail) {
+    @Override
+    public boolean emailAlreadyExists(String userEmail) {
         try {
             return repository.getByEmail(userEmail) != null;
         } catch (Exception e) {

@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.SendFailedException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.UUID;
@@ -54,8 +55,11 @@ public class UsersController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<?> createNewUser(@RequestBody final AccountRegDto accountRegDto) {
+    public ResponseEntity<?> createNewUser(@RequestBody final AccountRegDto accountRegDto) throws SendFailedException {
         String token = UUID.randomUUID().toString();
+        if(userInfoService.emailAlreadyExists(accountRegDto.getEmail())){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         registrationHandler.startUserRegistration(accountRegDto, token);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -71,8 +75,7 @@ public class UsersController {
 
     @PostMapping("/activation")
     public ResponseEntity<AuthResponse> activateUserProfile(@RequestBody AccountActivationDto accountActivationDto) {
-        if (registrationHandler.accountActivated(accountActivationDto.getUserEmail(), accountActivationDto.getActivationCode()))
-        {
+        if (registrationHandler.accountActivated(accountActivationDto.getUserEmail(), accountActivationDto.getActivationCode())) {
             UserInfo user = userInfoService.getByEmail(accountActivationDto.getUserEmail());
             AuthResponse response = new AuthResponse(user.getId(), user.getEmail());
             return new ResponseEntity<AuthResponse>(response, HttpStatus.OK);
@@ -107,7 +110,7 @@ public class UsersController {
     }
 
     @DeleteMapping("/profile/delete/{userId}")
-    public ResponseEntity<?> deleteUserProfile(@PathVariable("userId") int userId){
+    public ResponseEntity<?> deleteUserProfile(@PathVariable("userId") int userId) {
         UserInfo user = userInfoService.getById(userId);
         Token token = user.getToken();
         tokenService.delete(token);
