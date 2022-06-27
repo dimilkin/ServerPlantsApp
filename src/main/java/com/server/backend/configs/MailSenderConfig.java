@@ -17,6 +17,8 @@ public class MailSenderConfig {
         javaMailSender.setHost("smtp-mail.outlook.com");
         javaMailSender.setUsername("myplantapp@outlook.com");
         javaMailSender.setPassword("MyPa$$word");
+        javaMailSender.setPort(587);
+        javaMailSender.setProtocol("smtp");
         Properties mailProperties = new Properties();
         mailProperties.put("mail.smtp.starttls.enable", "true");
         mailProperties.put("mail.smtp.debug", "true");
