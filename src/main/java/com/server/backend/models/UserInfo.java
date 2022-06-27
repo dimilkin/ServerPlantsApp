@@ -21,8 +21,7 @@ public class UserInfo {
     @Column(name = "password")
     private String password;
 
-    @JsonIgnore
-    @Column(name = "verif_code")
+    @Transient
     private String verificationCode;
 
     @JsonIgnore
