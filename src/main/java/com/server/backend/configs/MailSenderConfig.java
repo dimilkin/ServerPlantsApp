@@ -14,12 +14,13 @@ public class MailSenderConfig {
     @Bean
     public MailSender javaMailService() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setHost("smtp-mail.outlook.com");
-        javaMailSender.setUsername("myplantapp@outlook.com");
-        javaMailSender.setPassword("MyPa$$word");
+        javaMailSender.setHost("smtp.gmail.com");
         javaMailSender.setPort(587);
         javaMailSender.setProtocol("smtp");
+        javaMailSender.setUsername("my.plant.keeper@gmail.com");
+        javaMailSender.setPassword("mjmmrhqaivuoesuy");
         Properties mailProperties = new Properties();
+        mailProperties.put("mail.smtp.auth", "true");
         mailProperties.put("mail.smtp.starttls.enable", "true");
         mailProperties.put("mail.smtp.debug", "true");
         javaMailSender.setJavaMailProperties(mailProperties);
