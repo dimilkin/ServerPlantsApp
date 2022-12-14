@@ -33,7 +33,7 @@ public class PlantsController {
         return new ResponseEntity<PlantModel>(HttpStatus.OK);
     }
 
-    @PostMapping("collection")
+    @PostMapping("addAll/plant")
     public ResponseEntity<String> createPlantsList(@RequestBody List<PlantModel> plantModels) {
         plantsService.insertAllToDb(plantModels);
         return new ResponseEntity<String>( HttpStatus.OK);

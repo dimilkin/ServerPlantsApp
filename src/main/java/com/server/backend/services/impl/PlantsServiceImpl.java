@@ -56,7 +56,7 @@ public class PlantsServiceImpl implements PlantsService {
 
     @Override
     public void insertAllToDb(List<PlantModel> plants) {
-        plants.forEach(plant -> plantsRepo.save(plant));
+        plantsRepo.saveAll(plants);
     }
 
     @Override

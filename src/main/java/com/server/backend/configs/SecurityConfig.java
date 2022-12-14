@@ -19,7 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.server.backend.security.Constants.SIGN_UP_URL;
+import static com.server.backend.security.Constants.*;
 
 @Configuration
 @EnableWebSecurity
@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         restHttp.antMatcher("/v.1.0/api/**");
         restHttp.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
-                .antMatchers("/v.1.0/api/user/ping", "/v.1.0/api/user/activation").permitAll()
+                .antMatchers(PING_URL, ACTIVATION_URL).permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/v.1.0/api/user/authentication").permitAll()
                 .anyRequest().authenticated()

@@ -69,7 +69,7 @@ public class UserPlantsController {
         }
     }
 
-    @DeleteMapping("{hostUserId}/{plantId}")
+    @DeleteMapping("{hostUserId}/{userPlantId}")
     public ResponseEntity<ResponseBody> deletePlantFromUser(HttpServletRequest request,
                                                             @PathVariable("hostUserId") int hostUserId,
                                                             @PathVariable("userPlantId") int userPlantId

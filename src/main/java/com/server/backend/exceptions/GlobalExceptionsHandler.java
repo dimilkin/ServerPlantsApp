@@ -18,9 +18,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.EntityNotFoundException;
 
 @ControllerAdvice
-public class ExceptionsHandler {
+public class GlobalExceptionsHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(com.server.backend.exceptions.ExceptionsHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionsHandler.class);
 
     @ExceptionHandler(value = NoResultException.class)
     public ResponseEntity<Object> handleInvalidInputException(NoResultException ex) {
@@ -61,7 +61,6 @@ public class ExceptionsHandler {
     @ExceptionHandler(value = InternalAuthenticationServiceException.class)
     public ResponseEntity<Object> handleAuthenticationException(InternalAuthenticationServiceException ex) {
         logger.error("Authentication Exception : ", ex.getMessage());
-        ex.printStackTrace();
         return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body("Authentication Failed");
     }
 
