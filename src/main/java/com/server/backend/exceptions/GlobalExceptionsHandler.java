@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -60,6 +61,12 @@ public class GlobalExceptionsHandler {
 
     @ExceptionHandler(value = InternalAuthenticationServiceException.class)
     public ResponseEntity<Object> handleAuthenticationException(InternalAuthenticationServiceException ex) {
+        logger.error("Authentication Exception : ", ex.getMessage());
+        return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body("Authentication Failed");
+    }
+
+    @ExceptionHandler(value = RequestRejectedException.class)
+    public ResponseEntity<Object> handleAuthenticationException(RequestRejectedException ex) {
         logger.error("Authentication Exception : ", ex.getMessage());
         return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body("Authentication Failed");
     }
