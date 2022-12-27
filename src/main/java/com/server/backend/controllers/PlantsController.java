@@ -71,10 +71,24 @@ public class PlantsController {
         return new ResponseEntity<String>("Successfully added more info", HttpStatus.OK);
     }
 
+    @PutMapping("listOfAdditionalInfo/{plantId}")
+    public ResponseEntity<String> addListOfInfoForPlant(@PathVariable("plantId") int plantId,
+                                                  @RequestBody List<AdditionalPlantInfo> additionalPlantInfoList) {
+        plantsInfoService.addListOfAdditionalInfoToPlant(plantId, additionalPlantInfoList);
+        return new ResponseEntity<String>("Successfully added more info", HttpStatus.OK);
+    }
+
     @PutMapping("plantProblem/{plantId}")
     public ResponseEntity<String> addProblemInfoForPlant(@PathVariable("plantId") int plantId,
                                                              @RequestBody PotentialPlantProblems plantProblem) {
         plantsInfoService.addPotentialProblemsInfoToPlant(plantId, plantProblem);
+        return new ResponseEntity<String>("Successfully added info about potential problem for plant", HttpStatus.OK);
+    }
+
+    @PutMapping("allPlantProblems/{plantId}")
+    public ResponseEntity<String> addAllProblemInfoForPlant(@PathVariable("plantId") int plantId,
+                                                         @RequestBody List<PotentialPlantProblems> plantProblems) {
+        plantsInfoService.addListOfPotentialProblemsInfoToPlant(plantId, plantProblems);
         return new ResponseEntity<String>("Successfully added info about potential problem for plant", HttpStatus.OK);
     }
 }

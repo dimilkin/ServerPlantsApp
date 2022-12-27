@@ -9,6 +9,8 @@ import com.server.backend.services.PlantsInfoService;
 import com.server.backend.services.PlantsService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PlantsInfoServiceImpl implements PlantsInfoService {
 
@@ -33,6 +35,16 @@ public class PlantsInfoServiceImpl implements PlantsInfoService {
     }
 
     @Override
+    public String addListOfAdditionalInfoToPlant(int plantId, List<AdditionalPlantInfo> additionalPlantInfoList) {
+        PlantModel plantModel = plantsService.getById(plantId);
+        for (AdditionalPlantInfo additionalPlantInfo : additionalPlantInfoList) {
+            additionalPlantInfo.setPlantId(plantModel);
+            additionalPlantInfoRepo.save(additionalPlantInfo);
+        }
+        return "Success!";
+    }
+
+    @Override
     public String updateAdditionalInfoOfPlant(int plantId, AdditionalPlantInfo additionalPlantInfo) {
         return null;
     }
@@ -42,6 +54,16 @@ public class PlantsInfoServiceImpl implements PlantsInfoService {
         PlantModel plantModel = plantsService.getById(plantId);
         potentialPlantProblems.setPlantId(plantModel);
         potentialPlantProblemsRepo.save(potentialPlantProblems);
+        return "Success!";
+    }
+
+    @Override
+    public String addListOfPotentialProblemsInfoToPlant(int plantId, List<PotentialPlantProblems> potentialPlantProblems) {
+        PlantModel plantModel = plantsService.getById(plantId);
+        for (PotentialPlantProblems potentialProblem : potentialPlantProblems) {
+            potentialProblem.setPlantId(plantModel);
+            potentialPlantProblemsRepo.save(potentialProblem);
+        }
         return "Success!";
     }
 
