@@ -26,4 +26,5 @@ public class MailSenderConfig {
         javaMailSender.setJavaMailProperties(mailProperties);
         return javaMailSender;
     }
+
 }
