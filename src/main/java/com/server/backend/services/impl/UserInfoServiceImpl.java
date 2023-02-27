@@ -26,7 +26,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public void create(UserInfo user) {
         if (emailAlreadyExists(user.getEmail())) {
-            throw new DuplicateEntityException("User with such e-mail already exists");
+            throw new DuplicateEntityException("User with such e-mail already exists : " + user.getEmail());
         }
         repository.save(user);
     }
@@ -46,7 +46,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (repository.findById(id).isPresent()) {
             return repository.findById(id).get();
         } else {
-            throw new EntityNotFoundException("No user with that ID exists in DB");
+            throw new EntityNotFoundException("No user with ID exists in DB : " + id);
         }
     }
 
@@ -55,7 +55,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (emailAlreadyExists(email)) {
             return repository.getByEmail(email);
         }
-        throw new EntityNotFoundException("No user found with that email");
+        throw new EntityNotFoundException("No user found with email : " + email);
     }
 
     @Override

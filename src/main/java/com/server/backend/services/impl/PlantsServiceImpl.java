@@ -92,7 +92,7 @@ public class PlantsServiceImpl implements PlantsService {
         if (plantsRepo.findById(id).isPresent()) {
             return plantsRepo.findById(id).get();
         } else {
-            throw new EntityNotFoundException("No plant with that ID exists in DB");
+            throw new EntityNotFoundException("No plant with that ID exists in DB : " + id);
         }
     }
 }
