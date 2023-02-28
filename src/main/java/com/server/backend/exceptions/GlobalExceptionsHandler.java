@@ -12,7 +12,7 @@ import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.hibernate.NonUniqueResultException;
+import javax.persistence.NonUniqueResultException;
 
 import javax.mail.SendFailedException;
 import javax.persistence.NoResultException;

@@ -67,6 +67,9 @@ public class UsersController {
     @RequestMapping("/authentication")
     public ResponseEntity<?> createAuthenticationToken(@RequestHeader("userMail") String email,
                                                        @RequestHeader("userPass") String password) {
+        if (email.isBlank() || email.isEmpty() || password.isEmpty() || password.isBlank()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         authenticate(email, password);
         final UserInfo userDetails = userInfoService.getByEmail(email);
         final String token = jwtTokenUtil.generateToken(userDetails);
@@ -75,6 +78,10 @@ public class UsersController {
 
     @PostMapping("/activation")
     public ResponseEntity<AuthResponse> activateUserProfile(@RequestBody AccountActivationDto accountActivationDto) {
+        if (accountActivationDto.getUserEmail().isBlank() || accountActivationDto.getUserEmail().isEmpty() ||
+                accountActivationDto.getActivationCode().isEmpty() ||  accountActivationDto.getActivationCode().isBlank()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         if (registrationHandler.accountActivated(accountActivationDto.getUserEmail(), accountActivationDto.getActivationCode())) {
             UserInfo user = userInfoService.getByEmail(accountActivationDto.getUserEmail());
             AuthResponse response = new AuthResponse(user.getId(), user.getEmail());
