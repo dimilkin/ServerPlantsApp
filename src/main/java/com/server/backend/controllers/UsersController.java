@@ -4,13 +4,17 @@ package com.server.backend.controllers;
 import com.server.backend.dto.AccountActivationDto;
 import com.server.backend.dto.AccountRegDto;
 import com.server.backend.dto.AuthResponse;
+import com.server.backend.exceptions.GlobalExceptionsHandler;
 import com.server.backend.models.Token;
 import com.server.backend.models.UserInfo;
 import com.server.backend.security.UserAssessmentService;
 import com.server.backend.security.UserRegistrationHandler;
 import com.server.backend.security.jwt.JwtTokenUtil;
 import com.server.backend.services.UserInfoService;
+import com.server.backend.services.ValidationService;
 import com.server.backend.services.VerificationTokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,19 +38,18 @@ public class UsersController {
     private JwtTokenUtil jwtTokenUtil;
     private UserAssessmentService assessmentService;
     private VerificationTokenService tokenService;
+    private ValidationService validationService;
 
-    public UsersController(UserInfoService userInfoService,
-                           UserRegistrationHandler registrationHandler,
-                           AuthenticationManager authenticationManager,
-                           JwtTokenUtil jwtTokenUtil,
-                           UserAssessmentService assessmentService,
-                           VerificationTokenService tokenService) {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionsHandler.class);
+
+    public UsersController(UserInfoService userInfoService, UserRegistrationHandler registrationHandler, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, UserAssessmentService assessmentService, VerificationTokenService tokenService, ValidationService validationService) {
         this.userInfoService = userInfoService;
         this.registrationHandler = registrationHandler;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.assessmentService = assessmentService;
         this.tokenService = tokenService;
+        this.validationService = validationService;
     }
 
     @GetMapping("ping")
@@ -57,7 +60,7 @@ public class UsersController {
     @PostMapping("/registration")
     public ResponseEntity<?> createNewUser(@RequestBody final AccountRegDto accountRegDto) throws SendFailedException {
         String token = UUID.randomUUID().toString();
-        if(userInfoService.emailAlreadyExists(accountRegDto.getEmail())){
+        if (userInfoService.emailAlreadyExists(accountRegDto.getEmail())) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         registrationHandler.startUserRegistration(accountRegDto, token);
@@ -67,7 +70,8 @@ public class UsersController {
     @RequestMapping("/authentication")
     public ResponseEntity<?> createAuthenticationToken(@RequestHeader("userMail") String email,
                                                        @RequestHeader("userPass") String password) {
-        if (email.isBlank() || email.isEmpty() || password.isEmpty() || password.isBlank()){
+        if (validationService.isEmailInvalid(email) || validationService.isValueInvalid(password)) {
+            logger.warn("Trying to authenticate with invalid credentials - password: " + password + " email : " + email);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         authenticate(email, password);
@@ -78,8 +82,9 @@ public class UsersController {
 
     @PostMapping("/activation")
     public ResponseEntity<AuthResponse> activateUserProfile(@RequestBody AccountActivationDto accountActivationDto) {
-        if (accountActivationDto.getUserEmail().isBlank() || accountActivationDto.getUserEmail().isEmpty() ||
-                accountActivationDto.getActivationCode().isEmpty() ||  accountActivationDto.getActivationCode().isBlank()){
+        if (validationService.isEmailInvalid(accountActivationDto.getUserEmail())||
+                accountActivationDto.getActivationCode().isEmpty() || accountActivationDto.getActivationCode().isBlank()) {
+            logger.warn("Invalid profile activation attempt");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if (registrationHandler.accountActivated(accountActivationDto.getUserEmail(), accountActivationDto.getActivationCode())) {
@@ -94,12 +99,14 @@ public class UsersController {
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<UserInfo> getUserInfo(@PathVariable("userId") int userId) {
+        logger.info("User info requested for userId : " + userId);
         UserInfo userInfo = userInfoService.getById(userId);
         return new ResponseEntity<UserInfo>(userInfo, HttpStatus.OK);
     }
 
     @GetMapping("/allProfile")
     public ResponseEntity<List<UserInfo>> getAllUserInfo() {
+        logger.warn("User info requested for all users");
         List<UserInfo> userInfoList = userInfoService.getAll();
         return new ResponseEntity<List<UserInfo>>(userInfoList, HttpStatus.OK);
     }

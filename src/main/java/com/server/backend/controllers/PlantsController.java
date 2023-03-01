@@ -2,11 +2,14 @@ package com.server.backend.controllers;
 
 import com.server.backend.dto.PlantInfoDto;
 import com.server.backend.dto.PlantsSearchDtoInfo;
+import com.server.backend.exceptions.GlobalExceptionsHandler;
 import com.server.backend.models.AdditionalPlantInfo;
 import com.server.backend.models.PlantModel;
 import com.server.backend.models.PotentialPlantProblems;
 import com.server.backend.services.PlantsInfoService;
 import com.server.backend.services.PlantsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,8 @@ public class PlantsController {
 
     private final PlantsService plantsService;
     private final PlantsInfoService plantsInfoService;
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionsHandler.class);
+
 
     public PlantsController(PlantsService plantsService, PlantsInfoService plantsInfoService) {
         this.plantsService = plantsService;
@@ -48,12 +53,14 @@ public class PlantsController {
 
     @GetMapping("{plantId}")
     public ResponseEntity<PlantModel> getInfoForPlantById(@PathVariable("plantId") int plantId) {
+        logger.info("Request made for info for plant with Id : " + plantId);
         PlantModel plant = plantsService.getById(plantId);
         return new ResponseEntity<PlantModel>(plant, HttpStatus.OK);
     }
 
     @GetMapping("allPlants")
     public ResponseEntity<List<PlantModel>> getInfoForAllPlants() {
+        logger.info("Request made for info for all plants");
         List<PlantModel> plantsList = plantsService.getAll();
         return new ResponseEntity<List<PlantModel>>(plantsList, HttpStatus.OK);
     }
