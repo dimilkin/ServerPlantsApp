@@ -88,6 +88,7 @@ public class PlantsController {
     @PutMapping("plantProblem/{plantId}")
     public ResponseEntity<String> addProblemInfoForPlant(@PathVariable("plantId") int plantId,
                                                              @RequestBody PotentialPlantProblems plantProblem) {
+        logger.info("Adding problemInfo for plant : " + plantId);
         plantsInfoService.addPotentialProblemsInfoToPlant(plantId, plantProblem);
         return new ResponseEntity<String>("Successfully added info about potential problem for plant", HttpStatus.OK);
     }
