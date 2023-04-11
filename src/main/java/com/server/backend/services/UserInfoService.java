@@ -8,7 +8,7 @@ public interface UserInfoService {
 
     List<UserInfo> getAll();
 
-    void create(UserInfo user);
+    UserInfo create(UserInfo user);
 
     void update(UserInfo user);
 

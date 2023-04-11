@@ -58,7 +58,7 @@ public class UserPlant {
     }
 
     public String getProvidedName() {
-        return providedName;
+        return providedName.isEmpty()? "Empty" : providedName;
     }
 
     public void setProvidedName(String providedName) {

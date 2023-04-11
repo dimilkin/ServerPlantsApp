@@ -4,6 +4,7 @@ import com.server.backend.exceptions.DuplicateEntityException;
 import com.server.backend.models.UserInfo;
 import com.server.backend.repos.UserInfoRepo;
 import com.server.backend.services.UserInfoService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -24,11 +25,11 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public void create(UserInfo user) {
+    public UserInfo create(UserInfo user) {
         if (emailAlreadyExists(user.getEmail())) {
             throw new DuplicateEntityException("User with such e-mail already exists : " + user.getEmail());
         }
-        repository.save(user);
+       return repository.save(user);
     }
 
     @Override

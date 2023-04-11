@@ -2,11 +2,14 @@ package com.server.backend.security;
 
 import com.server.backend.dto.AccountRegDto;
 import com.server.backend.events.OnCreateAccountEvent;
+import com.server.backend.exceptions.GlobalExceptionsHandler;
 import com.server.backend.models.UserInfo;
 import com.server.backend.models.UserRole;
 import com.server.backend.services.UserInfoService;
 import com.server.backend.services.UserRolesService;
 import com.server.backend.services.VerificationTokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -27,6 +30,7 @@ public class UserRegistrationHandler {
     UserRolesService rolesService;
     PasswordEncoder encoder;
     Map<String, UserInfo> usersWaitingActivation = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionsHandler.class);
 
     public UserRegistrationHandler(UserInfoService userInfoService, VerificationTokenService tokenService, UserRolesService rolesService,
                                    ApplicationEventPublisher eventPublisher, PasswordEncoder encoder) {
@@ -57,7 +61,8 @@ public class UserRegistrationHandler {
         UserInfo user = usersWaitingActivation.get(code);
         if (user != null && user.getEmail().equals(email)) {
             user.setEnabled(true);
-            userInfoService.create(user);
+            UserInfo createdUser = userInfoService.create(user);
+            logger.info("User was created with id: " + createdUser.getId() + " and email: " + createdUser.getEmail());
             return true;
         }
         return false;

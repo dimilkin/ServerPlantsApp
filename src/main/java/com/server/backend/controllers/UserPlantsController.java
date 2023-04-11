@@ -2,12 +2,15 @@ package com.server.backend.controllers;
 
 import com.server.backend.dto.ResponseBody;
 import com.server.backend.dto.UserPlantDto;
+import com.server.backend.exceptions.GlobalExceptionsHandler;
 import com.server.backend.models.UserInfo;
 import com.server.backend.models.UserPlant;
 import com.server.backend.security.UserAssessmentService;
 import com.server.backend.services.PlantsService;
 import com.server.backend.services.UserInfoService;
 import com.server.backend.services.UserPlantService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,7 @@ public class UserPlantsController {
     private final UserInfoService userInfoService;
     private final UserAssessmentService assessmentService;
     private final UserPlantService userPlantService;
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionsHandler.class);
 
     public UserPlantsController(PlantsService plantsService, UserInfoService userInfoService,
                                 UserAssessmentService assessmentService, UserPlantService userPlantService) {
@@ -46,6 +50,8 @@ public class UserPlantsController {
             userPlant.setUserOwner(hostUser);
             userPlant.setPlant(plantsService.getById(plantId));
             UserPlant savedUserPlant = userPlantService.addPlantToUserOwnCollection(userPlant);
+            logger.info("UserPlant with id: " + savedUserPlant.getId() + "And name: " + savedUserPlant.getProvidedName()
+                    + " was created by user with id: " + savedUserPlant.getUserOwner().getId());
             return new ResponseEntity<UserPlant>(savedUserPlant, HttpStatus.OK);
         } else {
             throw new IllegalAccessException(" User can't change other users data");
