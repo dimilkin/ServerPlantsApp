@@ -83,7 +83,7 @@ public class UsersController {
     @PostMapping("/activation")
     public ResponseEntity<AuthResponse> activateUserProfile(@RequestBody AccountActivationDto accountActivationDto) {
         if (validationService.isEmailInvalid(accountActivationDto.getUserEmail()) ||
-                accountActivationDto.getActivationCode().isEmpty() || accountActivationDto.getActivationCode().isBlank()) {
+                validationService.isValueInvalid(accountActivationDto.getActivationCode())) {
             logger.warn("Invalid profile activation attempt");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
