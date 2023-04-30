@@ -12,13 +12,15 @@ import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import javax.persistence.NonUniqueResultException;
 
 import javax.mail.SendFailedException;
 import javax.persistence.NoResultException;
 import javax.persistence.EntityNotFoundException;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionsHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionsHandler.class);
@@ -30,7 +32,7 @@ public class GlobalExceptionsHandler {
     }
 
     @ExceptionHandler(value = RequestRejectedException.class)
-    public ResponseEntity<Object> handleRejectedRequestException(NoResultException ex) {
+    public ResponseEntity<Object> handleRejectedRequestException(RequestRejectedException ex) {
         logger.error("NRequest was rejected from firewall : " + ex.getMessage());
         return new ResponseEntity<Object>("No data found for your request", HttpStatus.NO_CONTENT);
     }
