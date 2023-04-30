@@ -23,6 +23,12 @@ public class GlobalExceptionsHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionsHandler.class);
 
+    @ExceptionHandler(value = RequestRejectedException.class)
+    public ResponseEntity<Object> handleRejectedRequestException (RequestRejectedException exception) {
+        logger.error("Bad request was rejected : " + exception.getMessage());
+        return ResponseEntity.status( HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
     @ExceptionHandler(value = NoResultException.class)
     public ResponseEntity<Object> handleInvalidInputException(NoResultException ex) {
         logger.error("No data was found for query: " + ex.getMessage());
