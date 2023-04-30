@@ -31,12 +31,6 @@ public class GlobalExceptionsHandler {
         return new ResponseEntity<Object>("No data found for your request", HttpStatus.NO_CONTENT);
     }
 
-    @ExceptionHandler(value = RequestRejectedException.class)
-    public ResponseEntity<Object> handleRejectedRequestException(RequestRejectedException ex) {
-        logger.error("NRequest was rejected from firewall : " + ex.getMessage());
-        return new ResponseEntity<Object>("No data found for your request", HttpStatus.NO_CONTENT);
-    }
-
     @ExceptionHandler(value = NonUniqueResultException.class)
     public ResponseEntity<Object> handleInvalidInputException(NonUniqueResultException ex) {
         logger.error("More than one results found for query: " + ex.getMessage());
