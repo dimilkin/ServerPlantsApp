@@ -4,7 +4,6 @@ import com.server.backend.exceptions.DuplicateEntityException;
 import com.server.backend.models.UserInfo;
 import com.server.backend.repos.UserInfoRepo;
 import com.server.backend.services.UserInfoService;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
