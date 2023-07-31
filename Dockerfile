@@ -1,9 +1,9 @@
 FROM openjdk:11
 
-WORKDIR /app
+COPY --from=build /home/app/target/plants_server.jar /usr/local/lib/plants_server.jar
 
 ENV JAVA_TOOL_OPTIONS "-XX:MaxRAM=250000000"
 
-ADD target/plants_server.jar plants_server.jar
+EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","plants_server.jar"]
