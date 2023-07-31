@@ -1,13 +1,9 @@
-FROM eclipse-temurin:17-jdk-focal
+FROM openjdk:11
 
 WORKDIR /app
 
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline
+ENV JAVA_TOOL_OPTIONS "-XX:MaxRAM=250000000"
 
-COPY src ./src
+ADD target/plants_server.jar plants_server.jar
 
-ENV JAVA_TOOL_OPTIONS "-XX:MaxRAM=250"
-
-CMD ["./mvnw", "spring-boot:run"]
+ENTRYPOINT ["java","-jar","plants_server.jar"]
