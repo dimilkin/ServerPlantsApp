@@ -5,6 +5,6 @@ RUN mvn -f /home/app/pom.xml clean package
 
 FROM openjdk:11-jre-slim
 COPY --from=build /home/app/target/plants_server.jar /usr/local/lib/plants_server.jar
-ENV JAVA_TOOL_OPTIONS "-XX:MaxRAM=200000000", "-Xmx150mb"
+ENV JAVA_TOOL_OPTIONS "-XX:MaxRAM=200000000, -Xmx150mb "
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/usr/local/lib/plants_server.jar"]
